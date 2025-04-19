@@ -1,9 +1,7 @@
 package com.example.sampleapi.user.data.service;
 
 import com.example.sampleapi.user.data.model.CredentialsDataModel;
-import com.example.sampleapi.user.data.model.Profile;
 import com.example.sampleapi.user.data.repo.CredentialsRepository;
-import com.example.sampleapi.user.data.repo.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +20,9 @@ public class CredentialsService {
      public CredentialsDataModel saveProfile(CredentialsDataModel credentialsDataModel){
          return credentialsRepository.save(credentialsDataModel);
      }
+
+    public CredentialsDataModel getUserByName(String name) {
+        return credentialsRepository.findByUserName(name)
+                .orElseThrow(() -> new RuntimeException("user not found!"));
+    }
 }

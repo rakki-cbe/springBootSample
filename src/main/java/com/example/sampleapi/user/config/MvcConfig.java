@@ -1,4 +1,4 @@
-package com.example.sampleapi.user.controller;
+package com.example.sampleapi.user.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;

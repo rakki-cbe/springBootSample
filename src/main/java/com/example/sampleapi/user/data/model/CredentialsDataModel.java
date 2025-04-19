@@ -13,7 +13,7 @@ public class CredentialsDataModel {
     @GeneratedValue
     Long id;
     public String name;
-    public String uerName;
+    public String userName;
     public String password;
     public String role;
 }

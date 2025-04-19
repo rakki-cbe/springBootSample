@@ -1,48 +1,53 @@
 package com.example.sampleapi.user.security;
 
-import com.example.sampleapi.user.data.model.CredentialsDataModel;
-import com.example.sampleapi.user.data.service.CredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Bean
-    public static PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Autowired
-    public CredentialsService credentialsService;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
-        http.csrf(csrf -> csrf.disable()) ; // Disabling CSRF
-        http.authorizeHttpRequests((request) -> request
-                .requestMatchers("/","/home","user/**").permitAll().anyRequest().authenticated())
-                .formLogin((form)-> form.loginPage("/login").permitAll())
-                .logout(LogoutConfigurer::permitAll).httpBasic(Customizer.withDefaults());
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()); // Disabling CSRF
+        http.authorizeHttpRequests((request) -> request.requestMatchers("/", "/home", "user/**", "/h2-console/**").permitAll().anyRequest().authenticated()).formLogin((form) -> form.loginPage("/login").permitAll()).logout(LogoutConfigurer::permitAll).httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
+    /**
+     * This will fetch user from out local db for givent username and validate with password
+     *
+     * @return
+     */
     @Bean
+    public DaoAuthenticationProvider authProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+
+
+   /*
+   // for static authentication
+   @Bean
     public UserDetailsService userDetailsService(){
         List<CredentialsDataModel> data = credentialsService.getAllUser();
         List<UserDetails> userDetails = data.stream().map( userDate -> {
@@ -61,8 +66,12 @@ public class WebSecurityConfig {
                 .build();
         //userDetails.add(dataStatic);
         return new InMemoryUserDetailsManager(dataStatic);
-    }
+    }*/
 
+    /***
+     * Used to ignore authantication for h2console
+     * @return
+     */
     @Bean
     WebSecurityCustomizer ignoringCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/h2-console/**");
