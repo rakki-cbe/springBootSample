@@ -21,6 +21,11 @@ public class CredentialsService {
          return credentialsRepository.save(credentialsDataModel);
      }
 
+    public CredentialsDataModel checkUserCredential(CredentialsDataModel credentialsDataModel) {
+        return credentialsRepository.getUserFromUserNameAndPassword(credentialsDataModel.userName, credentialsDataModel.password)
+                .orElseThrow(() -> new RuntimeException("user not found!"));
+    }
+
     public CredentialsDataModel getUserByName(String name) {
         return credentialsRepository.findByUserName(name)
                 .orElseThrow(() -> new RuntimeException("user not found!"));

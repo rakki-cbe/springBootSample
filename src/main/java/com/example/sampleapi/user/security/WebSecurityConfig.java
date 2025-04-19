@@ -27,7 +27,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()); // Disabling CSRF
-        http.authorizeHttpRequests((request) -> request.requestMatchers("/", "/home", "user/**", "/h2-console/**").permitAll().anyRequest().authenticated()).formLogin((form) -> form.loginPage("/login").permitAll()).logout(LogoutConfigurer::permitAll).httpBasic(Customizer.withDefaults());
+        http.authorizeHttpRequests((request) ->
+                request.requestMatchers("/", "/home", "user/**", "/h2-console/**").permitAll().anyRequest().authenticated()).formLogin((form) -> form.loginPage("/login").permitAll()).logout(LogoutConfigurer::permitAll).httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
